@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Currency Converter</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+    <conversion-card></conversion-card>
+</div>
+
+<script type="text/javascript">
+    Vue.component('conversion-card', {
+        data() {
+            return {
+                amount: 0,
+                fromCurrency: '',
+                toCurrency: '',
+                result: null,
+                error: null
+            };
+        },
+        template: `
+            <div>
+                <form @submit.prevent="fetchRates">
+                    <div>
+                        <label for="amount">Amount:</label>
+                        <input type="number" v-model="amount" id="amount" required>
+                    </div>
+                    <div>
+                        <label for="from">From:</label>
+                        <input type="text" v-model="fromCurrency" id="from" required>
+                    </div>
+                    <div>
+                        <label for="to">To:</label>
+                        <input type="text" v-model="toCurrency" id="to" required>
+                    </div>
+                    <button type="submit">Convert</button>
+                </form>
+                <div v-if="result">
+                    <p>Converted Amount: {{ result }}</p>
+                </div>
+                <div v-if="error" style="color: red;">
+                    <p>Error: {{ error }}</p>
+                </div>
+            </div>
+        `,
+        methods: {
+            async fetchRates() {
+                this.result = null;
+                this.error = null;
+                try {
+                    const response = await axios.get('http://localhost:8080/conversions', {
+                        params: {
+                            amount: this.amount,
+                            from: this.fromCurrency,
+                            to: this.toCurrency
+                        }
+                    });
+                    this.result = response.data;
+                } catch (error) {
+                    if (error.response) {
+                        this.error = `Server responded with status ${error.response.status}: ${error.response.data}`;
+                    } else if (error.request) {
+                        this.error = 'No response received from the server.';
+                    } else {
+                        this.error = 'Error in setting up the request: ' + error.message;
+                    }
+                }
+            }
+        }
+    });
+
+    new Vue({
+        el: '#app'
+    });
+</script>
+</body>
+</html>
