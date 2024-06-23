@@ -27,7 +27,6 @@ public class CurrencyConversionController {
     @Autowired
     private SupportedCurrenciesService supportedCurrenciesService;
 
-    @CrossOrigin(origins = "http://localhost:8081")
     @GetMapping("/conversions")
     public String getConversions(
             @RequestParam double amount,
