@@ -21,7 +21,7 @@ public class CurrencyConversionControllerIntegrationTest {
 
     @Test
     public void whenValidCurrency_shouldReturnConversion() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/conversions")
+        mockMvc.perform(MockMvcRequestBuilders.post("/conversions")
                         .param("amount", "100")
                         .param("from", "EUR")
                         .param("to", "USD")
@@ -32,7 +32,7 @@ public class CurrencyConversionControllerIntegrationTest {
 
     @Test
     public void whenInvalidCurrencyCodeFrom_shouldReturnBadRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/conversions")
+        mockMvc.perform(MockMvcRequestBuilders.post("/conversions")
                         .param("amount", "100")
                         .param("from", "INVALID")
                         .param("to", "EUR")
@@ -43,7 +43,7 @@ public class CurrencyConversionControllerIntegrationTest {
 
     @Test
     public void whenInvalidCurrencyCodeTo_shouldReturnBadRequest() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/conversions")
+        mockMvc.perform(MockMvcRequestBuilders.post("/conversions")
                         .param("amount", "100")
                         .param("from", "USD")
                         .param("to", "INVALID")

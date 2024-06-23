@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_xsrf" th:content="${xsrfToken}"/>
     <title>Currency Converter</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
@@ -21,7 +22,7 @@
                 fromCurrency: '',
                 toCurrency: '',
                 result: null,
-                error: null
+                error: null,
             };
         },
         template: `
@@ -54,11 +55,17 @@
                 this.result = null;
                 this.error = null;
                 try {
-                    const response = await axios.get('http://localhost:8080/conversions', {
-                        params: {
-                            amount: this.amount,
-                            from: this.fromCurrency,
-                            to: this.toCurrency
+                    const token = document.querySelector('meta[name="_xsrf"]').content;
+                    console.log("TOKEN from meta:" + token);
+                    console.log("AMOUNT=" + this.amount);
+                    const response = await axios.post('http://localhost:8080/conversions', {
+                        amount: Number(this.amount),
+                        from: this.fromCurrency,
+                        to: this.toCurrency
+                    },
+                    {
+                        headers: {
+                            'X-XSRF-TOKEN': token
                         }
                     });
                     this.result = response.data;
@@ -71,6 +78,11 @@
                         this.error = 'Error in setting up the request: ' + error.message;
                     }
                 }
+            },
+            getCookieValue(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
             }
         }
     });
